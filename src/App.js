@@ -14,10 +14,26 @@ function App() {
     setList([...list, newItem]);
   };
 
-  // 移動させたいアイテム、現在存在するリスト、リストを更新するための関数、移動先のリスト、移動先のリスト、テキストを更新するための関数を引数とする。
+  // onchangeの処理
+  const textChange = (event, item, list, setList) => {
+    const newText = event.target.value;
+    // 更新関数を使って、同じidを持つ場合に...todoとnewTextを返す。
+    setList(list.map(el => el.id === item.id ? { ...el, text: newText } : el));
+  };
+
+  // アイテムの移動処理
+  /**
+   * アイテムを移動させる関数。
+   * @param {Object} item - 移動させたいアイテム。
+   * @param {Array} sourceList - 現在存在するリスト。
+   * @param {Function} setSourceList - リストを更新するための関数。
+   * @param {Array} targetList - 移動先のリスト。
+   * @param {Function} setTargetList - 移動先のリストを更新するための関数。
+   * @param {string} text - 移動先のリストに追加するテキスト。
+   */
   const moveItem = (item, sourceList, setSourceList, targetList, setTargetList, text) => {
     // sourceList から移動されるアイテムを除外し、updatedSourceList を作成。filterを使用して、移動されるアイテム以外の要素を残す。
-    const updatedSourceList = sourceList.filter((el) => el !== item);
+    const updatedSourceList = sourceList.filter((el) => el.id !== item.id);
     // 移動元のリストを更新
     setSourceList(updatedSourceList);
     // 移動先targetListに追加。移動後のテキスト内容を含むアイテムを作成。移動後リストには元のアイテムが保持され、かつテキスト内容が更新された状態で追加される。
@@ -32,15 +48,10 @@ function App() {
         <button onClick={() => addTextBox(todoList, setTodoList)}>作成+</button>
         {todoList.map((item) => (
           <div key={item.id}>
-            {/* id はtextbox-にそのアイテムの key 値を追加したもの。 defaultValue={item.text}で入力値を取得*/}
             <input
               className="textbox" type="text" placeholder="taskを入力" defaultValue={item.text}
               // onChangeを追加、テキスト取得。
-              onChange={(event) => {
-                const newText = event.target.value;
-                // 更新関数を使って、同じidを持つ場合に...todoとnewTextを返す。
-                setTodoList(todoList.map(todo => todo.id === item.id ? { ...todo, text: newText } : todo));
-              }}
+              onChange={(event) => textChange(event, item, todoList, setTodoList)}
             />
             {/* onClickで "item"=選択したテキストボックス ”todoList, setTodoList,”=現在のリスト、更新関数　"inProgressList, setInProgressList"で移動先の情報を渡す */}
             <button onClick={() => moveItem(item, todoList, setTodoList, inProgressList, setInProgressList, item.text)}>→移動</button>
@@ -53,10 +64,7 @@ function App() {
           <div key={item.id}>
             <input
               className="textbox" type="text" placeholder="taskを入力" defaultValue={item.text}
-              onChange={(event) => {
-                const newText = event.target.value;
-                setInProgressList(inProgressList.map(inProgress => inProgress.id === item.id ? { ...inProgress, text: newText } : inProgress));
-              }}
+              onChange={(event) => textChange(event, item, inProgressList, setInProgressList)}
             />
             <button onClick={() => moveItem(item, inProgressList, setInProgressList, todoList, setTodoList, item.text)}>←移動</button>
             <button onClick={() => moveItem(item, inProgressList, setInProgressList, doneList, setDoneList, item.text)}>→移動</button>
@@ -69,10 +77,7 @@ function App() {
           <div key={item.id}>
             <input
               className="textbox" type="text" placeholder="taskを入力" defaultValue={item.text}
-              onChange={(event) => {
-                const newText = event.target.value;
-                setDoneList(doneList.map(done => done.id === item.id ? { ...done, text: newText } : done));
-              }}
+              onChange={(event) => textChange(event, item, doneList, setDoneList)}
             />
             <button onClick={() => moveItem(item, doneList, setDoneList, inProgressList, setInProgressList, item.text)}>←移動</button>
           </div>
